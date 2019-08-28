@@ -13,7 +13,7 @@ npm start
 ```
 
 The **Backend API** will be available on:
-[localhost:5000](http://localhost:5000/ "http://localhost:3000/")
+[localhost:5000](http://localhost:5000/ "http://localhost:5000/")
 
 ## Author
 

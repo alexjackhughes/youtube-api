@@ -1,39 +1,27 @@
-// var mysql = require("mysql");
-
-// var connection = mysql.createConnection({
-//   host: "sql-database-youtube-api.cre99xo49ecy.us-east-2.rds.amazonaws.com",
-//   user: "admin",
-//   password: "password",
-//   port: 3306
-// });
-
-// console.log("getting to here");
-// connection.connect(function(err) {
-//   if (err) {
-//     console.error("Database connection failed: " + err.stack);
-//     return;
-//   }
-
-//   console.log("Connected to database.");
-// });
-
-// connection.end();
-
 import express from "express";
+import bodyParser from "body-parser";
 
-// Set up the express app
+import connection from "./setupDatabase";
+import routes from "./routes";
+
+const PORT = 5000;
 const app = express();
 
-// get all todos
-app.get("/api/v1/todos", (req, res) => {
-  res.status(200).send({
-    success: "true",
-    message: "todos retrieved successfully",
-    todos: db
-  });
-});
-const PORT = 5000;
+// Connect the routes to the Express server
+app.use("/", routes);
 
-app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
+// Use body-parser
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Set the app to listen on localhost:5000
+const server = app.listen(PORT, () => {
+  console.log(`Howdy! The server is running on port: ${PORT}`);
+});
+
+// Close the database on application close
+process.on("SIGINT", () => {
+  server.close(() => {
+    connection.end();
+    console.log("\nClosing the connection to database, bye! 👋");
+  });
 });
