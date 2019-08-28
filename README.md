@@ -15,6 +15,9 @@ npm start
 The **Backend API** will be available on:
 [localhost:5000](http://localhost:5000/ "http://localhost:5000/")
 
+**Note:** You may need to play around with the file path for `FILTER_FILE_PATH` as it's
+set to my computer.
+
 ## Documentation
 
 **GET**

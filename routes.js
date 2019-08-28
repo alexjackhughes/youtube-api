@@ -3,6 +3,7 @@ import axios from "axios";
 
 const router = express.Router();
 import connection from "./setupDatabase";
+import filters from "./searchFilter";
 
 const googleSecretKey = process.env.GOOGLE_KEY;
 const globalmtb = process.env.GLOBALMTB_ID;
@@ -37,18 +38,9 @@ function checker(title, searchQueries) {
   return titleMatchesQuery[0] ? true : false;
 }
 
-// Helper route providing a link to the docs.
-router.get("/", function(req, res) {
-  res.send(
-    `Your server is running!
-    \nCheck out the docs for info on how to run the API:
-    \nhttps://github.com/alexjackhughes/youtube-api`
-  );
-});
-
 /**
  * Takes an ID and returns a promise which resolves
- * into the last 20 videos for the provided channel.
+ * into the last 50 videos for the provided channel.
  *
  * @param {*} channelId Channel id
  */
@@ -59,14 +51,14 @@ const callYouTubeApi = channelId => {
 };
 
 /**
- * When hit will store youtube video titles and publishedAt dates
+ * When hit will store YouTube video titles and publishedAt dates
  * for the GlobalCyclingNetwork and globalmtb YouTube channels
  * to our database.
  */
 router.post("/youtube", async function(req, res) {
   try {
     // We need to filter items by the read file
-    const searchQueries = ["Jeremy"];
+    const searchQueries = filters;
 
     // Call both YouTube channels concurrently
     const resolvedVideosForChannels = await axios.all([
