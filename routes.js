@@ -8,6 +8,35 @@ const googleSecretKey = process.env.GOOGLE_KEY;
 const globalmtb = process.env.GLOBALMTB_ID;
 const globalCyclingNetwork = process.env.GLOBALCYCLING_ID;
 
+const generateId = () => {
+  return (
+    Math.random()
+      .toString(36)
+      .substring(2, 15) +
+    Math.random()
+      .toString(36)
+      .substring(2, 15)
+  );
+};
+
+/**
+ * Takes a title and an array of search queries,
+ * if the title partially matches any of the search queries
+ * then return true, otherwise return false
+ *
+ * @param {*} title
+ * @param {*} searchQueries
+ */
+function checker(title, searchQueries) {
+  const titleMatchesQuery = searchQueries.filter(search => {
+    if (title.indexOf(search) > -1) {
+      return title;
+    }
+  });
+
+  return titleMatchesQuery[0] ? true : false;
+}
+
 // Helper route providing a link to the docs.
 router.get("/", function(req, res) {
   res.send(
@@ -25,7 +54,7 @@ router.get("/", function(req, res) {
  */
 const callYouTubeApi = channelId => {
   return axios.get(
-    `https://www.googleapis.com/youtube/v3/search?key=${googleSecretKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=20`
+    `https://www.googleapis.com/youtube/v3/search?key=${googleSecretKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=50`
   );
 };
 
@@ -36,17 +65,28 @@ const callYouTubeApi = channelId => {
  */
 router.post("/youtube", async function(req, res) {
   try {
+    // We need to filter items by the read file
+    const searchQueries = ["Jeremy"];
+
     // Call both YouTube channels concurrently
-    const resolvedYouTubeData = await axios.all([
+    const resolvedVideosForChannels = await axios.all([
       callYouTubeApi(globalmtb),
       callYouTubeApi(globalCyclingNetwork)
     ]);
 
-    // Iterate through each video for each channel
-    // and add it to the database
-    resolvedYouTubeData.map(({ data }) => {
+    // Iterate through all the videos for each channel
+    resolvedVideosForChannels.map(({ data }) => {
       data.items.map(video => {
-        console.log("video", video);
+        const title = video.snippet.title;
+
+        // If a video title matches the search filter,
+        // add it to database
+        if (checker(title, searchQueries)) {
+          const id = generateId();
+          const publishedAt = video.snippet.publishedAt;
+
+          console.log(title);
+        }
       });
     });
   } catch (e) {
