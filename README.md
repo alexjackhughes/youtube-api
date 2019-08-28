@@ -43,7 +43,7 @@ _Fetch all videos that match the provided search query._
 POST /youtube
 ```
 
-_Finds and stores the titles and publishedAt for the YouTube channels GlobalCyclingNetwork and globalmtb._
+_Finds and stores the titles and publishedAt for **all** the videos on the YouTube channels GlobalCyclingNetwork and globalmtb._
 
 **DELETE**
 
