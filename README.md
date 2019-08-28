@@ -2,7 +2,7 @@
 
 _Expose an API endpoint, that when hit will store youtube video titles and **publishedAt** dates for the **GlobalCyclingNetwork** and **globalmtb** YouTube channels to a database. We only want to store videos that match the filter criteria_
 
-This API is built with Node/Express + Amazon's RDS for the database.
+This API is built with Node/Express + Amazon's RDS (running MySQL) for the database.
 
 ## Getting Started
 
