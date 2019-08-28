@@ -57,9 +57,6 @@ const callYouTubeApi = channelId => {
  */
 router.post("/youtube", async function(req, res) {
   try {
-    // We need to filter items by the read file
-    const searchQueries = filters;
-
     // Call both YouTube channels concurrently
     const resolvedVideosForChannels = await axios.all([
       callYouTubeApi(globalmtb),
@@ -72,12 +69,17 @@ router.post("/youtube", async function(req, res) {
         const title = video.snippet.title;
 
         // If a video title matches the search filter,
-        // add it to database
-        if (checker(title, searchQueries)) {
+        // add it to database.
+        if (checker(title, filters)) {
           const id = generateId();
-          const publishedAt = video.snippet.publishedAt;
+          const date = video.snippet.publishedAt;
 
-          console.log(title);
+          connection.query(
+            `INSERT INTO videos (id,title,date) VALUES ('${id}','${title}','${date}')`,
+            function(error, results, fields) {
+              if (error) throw error;
+            }
+          );
         }
       });
     });
