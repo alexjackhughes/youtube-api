@@ -1,12 +1,11 @@
+require("dotenv").config();
 import mysql from "mysql";
 
-// NOTE: In a production app these would be secret 'env' variables
-// but for ease of sharing the code I've left them static.
 const connection = mysql.createConnection({
-  host: "sql-database-youtube-api.cre99xo49ecy.us-east-2.rds.amazonaws.com",
-  user: "admin",
-  password: "password",
-  port: 3306
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT
 });
 
 connection.connect(function(err) {

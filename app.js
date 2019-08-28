@@ -1,10 +1,12 @@
+require("dotenv").config();
+
 import express from "express";
 import bodyParser from "body-parser";
 
 import connection from "./setupDatabase";
 import routes from "./routes";
 
-const PORT = 5000;
+const PORT = process.env.PORT;
 const app = express();
 
 // Connect the routes to the Express server

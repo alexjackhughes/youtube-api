@@ -4,6 +4,10 @@ import axios from "axios";
 const router = express.Router();
 import connection from "./setupDatabase";
 
+const googleSecretKey = process.env.GOOGLE_KEY;
+const globalmtb = process.env.GLOBALMTB_ID;
+const globalCyclingNetwork = process.env.GLOBALCYCLING_ID;
+
 // Helper route providing a link to the docs.
 router.get("/", function(req, res) {
   res.send(
@@ -20,10 +24,8 @@ router.get("/", function(req, res) {
  * @param {*} channelId Channel id
  */
 const callYouTubeApi = channelId => {
-  const googleApi = "AIzaSyBDtPDKGvseNYjlZCEfO8U4iliyNdUipYk";
-
   return axios.get(
-    `https://www.googleapis.com/youtube/v3/search?key=${googleApi}&channelId=${channelId}&part=snippet,id&order=date&maxResults=20`
+    `https://www.googleapis.com/youtube/v3/search?key=${googleSecretKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=20`
   );
 };
 
@@ -34,9 +36,6 @@ const callYouTubeApi = channelId => {
  */
 router.post("/youtube", async function(req, res) {
   try {
-    const globalmtb = "UC_A--fhX5gea0i4UtpD99Gg";
-    const globalCyclingNetwork = "UCuTaETsuCOkJ0H_GAztWt0Q";
-
     // Call both YouTube channels concurrently
     const resolvedYouTubeData = await axios.all([
       callYouTubeApi(globalmtb),
