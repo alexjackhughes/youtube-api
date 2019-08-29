@@ -55,21 +55,35 @@ router.post("/youtube", async function(req, res) {
 });
 
 // Fetch any YouTube videos meta data that has been stored.
-router.get("/youtube", function(req, res) {
+router.get("/youtube", async function(req, res) {
+  try {
+    await connection.query(`SELECT * FROM videos`, (error, results, fields) => {
+      if (error) throw error;
+
+      res.send({
+        code: 200,
+        response: results
+      });
+    });
+  } catch (e) {
+    res.send({
+      code: 400,
+      response: e.message
+    });
+  }
+});
+
+// Returns a specific YouTube video, queried by ID.
+router.get("/youtube/id/:id", function(req, res) {
   res.send("About example");
 });
 
-// Get a YouTube videos meta data by ID.
-router.get("/youtube/:id", function(req, res) {
-  res.send("About example");
-});
-
-// Search for all videos that match a keyword
+// Search for all videos that title's match a keyword
 router.get("/youtube/search/:search", function(req, res) {
   res.send("About example");
 });
 
-// Remove a YouTube videos meta data by ID.
+// Remove a YouTube video, queried by ID.
 router.delete("/youtube/:id", function(req, res) {
   res.send("About example");
 });
