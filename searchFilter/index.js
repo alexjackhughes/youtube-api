@@ -7,7 +7,9 @@ const filters = [];
  * and add each line to an array, which is then exported.
  */
 try {
+  // Make sure that this is the correct file path for your system
   const path = process.env.FILTER_FILE_PATH;
+
   const lineReader = require("readline").createInterface({
     input: require("fs").createReadStream(path)
   });
