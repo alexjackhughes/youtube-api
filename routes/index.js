@@ -55,9 +55,9 @@ router.post("/youtube", async function(req, res) {
 });
 
 // Fetch any YouTube videos meta data that has been stored.
-router.get("/youtube", async function(req, res) {
+router.get("/youtube", function(req, res) {
   try {
-    await connection.query(`SELECT * FROM videos`, (error, results, fields) => {
+    connection.query(`SELECT * FROM videos`, (error, results, fields) => {
       if (error) throw error;
 
       res.send({
@@ -74,8 +74,27 @@ router.get("/youtube", async function(req, res) {
 });
 
 // Returns a specific YouTube video, queried by ID.
-router.get("/youtube/id/:id", function(req, res) {
-  res.send("About example");
+router.get("/youtube/:id", function(req, res) {
+  const id = req.params.id;
+
+  try {
+    connection.query(
+      `SELECT * FROM videos WHERE id=${id}`,
+      (error, results, fields) => {
+        if (error) throw error;
+
+        res.send({
+          code: 200,
+          response: results
+        });
+      }
+    );
+  } catch (e) {
+    res.send({
+      code: 400,
+      response: e.message
+    });
+  }
 });
 
 // Search for all videos that title's match a keyword
