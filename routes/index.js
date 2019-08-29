@@ -123,7 +123,26 @@ router.get("/youtube/search/:search", function(req, res) {
 
 // Remove a YouTube video, queried by ID.
 router.delete("/youtube/:id", function(req, res) {
-  res.send("About example");
+  try {
+    const id = req.params.id;
+
+    connection.query(
+      `DELETE FROM videos WHERE id=${id}`,
+      (error, results, fields) => {
+        if (error) throw error;
+
+        res.send({
+          code: 204,
+          response: undefined
+        });
+      }
+    );
+  } catch (e) {
+    res.send({
+      code: 400,
+      response: e.message
+    });
+  }
 });
 
 export default router;
