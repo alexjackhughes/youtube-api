@@ -1,54 +1,14 @@
 import express from "express";
 import axios from "axios";
 
-const router = express.Router();
-import connection from "./setupDatabase";
-import filters from "./searchFilter";
+import { generateUniqueId, checker, callYouTubeApi } from "./helper";
+import connection from "../setupDatabase";
+import filters from "../searchFilter";
 
-const googleSecretKey = process.env.GOOGLE_KEY;
 const globalmtb = process.env.GLOBALMTB_ID;
 const globalCyclingNetwork = process.env.GLOBALCYCLING_ID;
 
-const generateId = () => {
-  return (
-    Math.random()
-      .toString(36)
-      .substring(2, 15) +
-    Math.random()
-      .toString(36)
-      .substring(2, 15)
-  );
-};
-
-/**
- * Takes a title and an array of search queries,
- * if the title partially matches any of the search queries
- * then return true, otherwise return false
- *
- * @param {*} title
- * @param {*} searchQueries
- */
-function checker(title, searchQueries) {
-  const titleMatchesQuery = searchQueries.filter(search => {
-    if (title.indexOf(search) > -1) {
-      return title;
-    }
-  });
-
-  return titleMatchesQuery[0] ? true : false;
-}
-
-/**
- * Takes an ID and returns a promise which resolves
- * into the last 50 videos for the provided channel.
- *
- * @param {*} channelId Channel id
- */
-const callYouTubeApi = channelId => {
-  return axios.get(
-    `https://www.googleapis.com/youtube/v3/search?key=${googleSecretKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=50`
-  );
-};
+const router = express.Router();
 
 /**
  * When hit will store YouTube video titles and publishedAt dates
@@ -57,34 +17,40 @@ const callYouTubeApi = channelId => {
  */
 router.post("/youtube", async function(req, res) {
   try {
-    // Call both YouTube channels concurrently
     const resolvedVideosForChannels = await axios.all([
       callYouTubeApi(globalmtb),
       callYouTubeApi(globalCyclingNetwork)
     ]);
 
     // Iterate through all the videos for each channel
-    resolvedVideosForChannels.map(({ data }) => {
-      data.items.map(video => {
+    resolvedVideosForChannels.map(({ data }, index) => {
+      data.items.map((video, index) => {
         const title = video.snippet.title;
 
-        // If a video title matches the search filter,
-        // add it to database.
+        // Only add a video if it matches the search filter
         if (checker(title, filters)) {
-          const id = generateId();
+          const id = generateUniqueId();
           const date = video.snippet.publishedAt;
 
           connection.query(
             `INSERT INTO videos (id,title,date) VALUES ('${id}','${title}','${date}')`,
-            function(error, results, fields) {
+            (error, results, fields) => {
               if (error) throw error;
             }
           );
         }
       });
     });
+
+    res.send({
+      code: 201,
+      response: "Successfully added YouTube meta data to database!"
+    });
   } catch (e) {
-    throw e;
+    res.send({
+      code: 400,
+      response: e.message
+    });
   }
 });
 
@@ -108,4 +74,4 @@ router.delete("/youtube/:id", function(req, res) {
   res.send("About example");
 });
 
-module.exports = router;
+export default router;
