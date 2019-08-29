@@ -75,9 +75,9 @@ router.get("/youtube", function(req, res) {
 
 // Returns a specific YouTube video, queried by ID.
 router.get("/youtube/:id", function(req, res) {
-  const id = req.params.id;
-
   try {
+    const id = req.params.id;
+
     connection.query(
       `SELECT * FROM videos WHERE id=${id}`,
       (error, results, fields) => {
@@ -99,7 +99,26 @@ router.get("/youtube/:id", function(req, res) {
 
 // Search for all videos that title's match a keyword
 router.get("/youtube/search/:search", function(req, res) {
-  res.send("About example");
+  try {
+    const search = req.params.search;
+
+    connection.query(
+      `SELECT * FROM videos WHERE title LIKE '%${search}%'`,
+      (error, results, fields) => {
+        if (error) throw error;
+
+        res.send({
+          code: 200,
+          response: results
+        });
+      }
+    );
+  } catch (e) {
+    res.send({
+      code: 400,
+      response: e.message
+    });
+  }
 });
 
 // Remove a YouTube video, queried by ID.
