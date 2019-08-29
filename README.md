@@ -46,7 +46,7 @@ _Fetch all videos that match the provided search query._
 POST /youtube
 ```
 
-_Finds and stores the titles and publishedAt for **all** the videos on the YouTube channels GlobalCyclingNetwork and globalmtb._
+_Finds and stores the titles and publishedAt for latest **50** the videos on the YouTube channels GlobalCyclingNetwork and globalmtb. I had to limit the request I was hitting YouTube's rate limit on free accounts._
 
 **DELETE**
 
